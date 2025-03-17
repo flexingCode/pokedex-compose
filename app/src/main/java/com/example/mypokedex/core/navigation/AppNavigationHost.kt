@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.mypokedex.pokedex.ui.Home
+import com.example.mypokedex.pokemon.ui.PokemonScreen
 import com.example.mypokedex.profile.ui.Profile
 
 @Composable
@@ -26,6 +27,13 @@ fun NavGraphBuilder.homeGraph(navController:NavController, modifier: Modifier){
     navigation(startDestination = "home_screen", route = AppBottomNavigation.Pokedex.route){
         composable("home_screen"){
             Home(modifier, navController)
+        }
+        composable("pokemon_screen/{pokemonId}"){
+            PokemonScreen(
+                modifier,
+                navController,
+            )
+
         }
     }
 }

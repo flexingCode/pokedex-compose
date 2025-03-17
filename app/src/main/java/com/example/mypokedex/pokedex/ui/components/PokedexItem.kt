@@ -2,6 +2,7 @@ package com.example.mypokedex.pokedex.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +41,9 @@ fun PokedexItem(
                 RoundedCornerShape(topStart = 64.dp, bottomStart = 64.dp)
                 )
             .padding(start = 16.dp)
+            .clickable {
+                onClick()
+            }
     ){
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(

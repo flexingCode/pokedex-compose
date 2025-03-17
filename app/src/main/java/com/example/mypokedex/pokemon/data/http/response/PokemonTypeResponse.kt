@@ -5,14 +5,16 @@ import com.google.gson.annotations.SerializedName
 data class PokemonTypeResponse(
     val id:Int,
     val name:String,
-    val height:Float,
-    val weight:Float,
     val sprites:PokemonTypeSpriteResponse
 )
 
 data class PokemonTypeSpriteResponse(
     @SerializedName("generation-iii")
-    val generationIII:GenerationTypeSpriteResponse
+    val generationIII:PokemonGenerationTypeResponse
+)
+
+data class PokemonGenerationTypeResponse(
+    val emerald:GenerationTypeSpriteResponse
 )
 
 data class GenerationTypeSpriteResponse(

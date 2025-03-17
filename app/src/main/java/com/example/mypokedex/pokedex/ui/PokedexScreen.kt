@@ -1,6 +1,5 @@
 package com.example.mypokedex.pokedex.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +30,7 @@ import kotlinx.coroutines.flow.debounce
 fun Home(
     modifier: Modifier,
     nav:NavController,
-    vm:PokemonViewModel = hiltViewModel()
+    vm:PokedexViewModel = hiltViewModel()
 ){
     val pokedexState by vm.pokemonListState.observeAsState(initial = PokedexScreenListState.Loading)
     val isLoadingMore by vm.isLoadingMore.observeAsState(initial = false)
@@ -59,7 +58,9 @@ fun Home(
                 ) {
                     state.pokemonList.forEach { pokemon ->
                         item {
-                            PokedexItem(name = pokemon.name){}
+                            PokedexItem(name = pokemon.name){
+                                nav.navigate("pokemon_screen/${pokemon.id}")
+                            }
                         }
                     }
                     item {
@@ -81,7 +82,7 @@ fun Home(
             }
             is PokedexScreenListState.Error -> {
                 Column {
-                    Text(text = state.message)
+                    Text(text = "Error: ${state.message}")
                 }
             }
             PokedexScreenListState.Loading -> {

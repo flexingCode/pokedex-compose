@@ -8,13 +8,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mypokedex.pokedex.ui.model.PokemonModel
 import com.example.mypokedex.pokedex.data.repository.PokedexRepository
+import com.example.mypokedex.pokedex.domain.PokedexUsesCases
+import com.example.mypokedex.pokemon.domain.GetPokemonDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PokemonViewModel @Inject constructor(
-    private val pokedexRepository: PokedexRepository
+class PokedexViewModel @Inject constructor(
+    private val pokedexUseCase: PokedexUsesCases
 ): ViewModel() {
     private val _pokemonListState = MutableLiveData<PokedexScreenListState>(PokedexScreenListState.Loading)
     val pokemonListState: LiveData<PokedexScreenListState> = _pokemonListState
@@ -36,9 +38,9 @@ class PokemonViewModel @Inject constructor(
        viewModelScope.launch {
            _pokemonListState.postValue(PokedexScreenListState.Loading)
            try{
-               val result = pokedexRepository.getPokedex()
+               val result = pokedexUseCase()
                if(result.results.isNotEmpty()){
-                   val pokemonModuleList = result.results.map { it-> PokemonModel(it.name) }
+                   val pokemonModuleList = result.results.map { it-> PokemonModel(getIdFromUri(it.url),it.name) }
                    _pokemonListState.postValue(PokedexScreenListState.Success(pokemonModuleList))
                    _pokemonList.postValue(pokemonModuleList)
                }else{
@@ -46,6 +48,7 @@ class PokemonViewModel @Inject constructor(
                }
            }catch (e: Exception){
                _pokemonListState.postValue(PokedexScreenListState.Error(e.message ?: "Unknown error"))
+               Log.e("PokemonViewModel", "Error loading pokemons", e)
            }
 
        }
@@ -58,8 +61,8 @@ class PokemonViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoadingMore.postValue( true )
             try{
-                val result = pokedexRepository.getPokedex(offset = _pokemonList.value?.size ?: 0, limit = 20)
-                val pokemonListModified = _pokemonList.value?.plus( result.results.map { it-> PokemonModel(it.name) })
+                val result = pokedexUseCase(offset = _pokemonList.value?.size ?: 0, limit = 20)
+                val pokemonListModified = _pokemonList.value?.plus( result.results.map { it-> PokemonModel(getIdFromUri(it.url),it.name) })
                 _pokemonList.postValue(pokemonListModified ?: emptyList())
                 _pokemonListState.postValue(PokedexScreenListState.Success(pokemonListModified ?: emptyList()))
             }catch (e: Exception){
@@ -69,6 +72,11 @@ class PokemonViewModel @Inject constructor(
                 _isLoadingMore.postValue(false)
             }
         }
+    }
+
+    private fun getIdFromUri(uri:String):Int {
+        val parts = uri.split("/")
+        return parts[parts.size - 2].toInt()
     }
 
 }
